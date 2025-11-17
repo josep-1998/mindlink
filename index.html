@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MindLink — AutoDeploy</title>
+<style>
+body{background:#050507;color:#e6eef8;font-family:Arial;margin:0;padding:20px;text-align:center;}
+h1{color:#00d1ff;}
+#board{width:320px;height:320px;margin:20px auto;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.pad{border-radius:12px;border:1px solid #222;background:#111;height:150px;transition:.2s;}
+.pad.glow{box-shadow:0 0 20px #00d1ff;transform:scale(1.05);}
+button{padding:10px 20px;margin:10px;background:#00d1ff;border:none;border-radius:10px;font-weight:bold;}
+</style>
+</head>
+<body>
+<h1>MindLink — Demo</h1>
+<p>Pulsa jugar para comenzar</p>
+
+<div id="board">
+  <div class="pad" data-id="0"></div>
+  <div class="pad" data-id="1"></div>
+  <div class="pad" data-id="2"></div>
+  <div class="pad" data-id="3"></div>
+</div>
+
+<button id="start">Jugar</button>
+<p>Puntuación: <span id="score">0</span></p>
+
+<script>
+const pads=[...document.querySelectorAll('.pad')];
+let seq=[],player=[],playing=false,score=0;
+
+function glow(i){
+  const p=pads[i];
+  p.classList.add('glow');
+  setTimeout(()=>p.classList.remove('glow'),300);
+}
+
+function playSeq(){
+  let i=0;
+  playing=false;
+  const int=setInterval(()=>{
+    glow(seq[i]);
+    i++;
+    if(i>=seq.length){clearInterval(int);playing=true;}
+  },600);
+}
+
+function nextRound(){
+  seq.push(Math.floor(Math.random()*4));
+  player=[];
+  playSeq();
+}
+
+pads.forEach((p,i)=>{
+  p.onclick=()=>{
+    if(!playing)return;
+    glow(i);
+    player.push(i);
+    if(player[player.length-1]!==seq[player.length-1]){
+      alert("Perdiste!");
+      playing=false;seq=[];score=0;
+      document.getElementById('score').innerText=0;
+      return;
+    }
+    if(player.length===seq.length){
+      score=seq.length;
+      document.getElementById('score').innerText=score;
+      setTimeout(nextRound,800);
+    }
+  };
+});
+
+document.getElementById('start').onclick=()=>{
+  seq=[];player=[];score=0;
+  document.getElementById('score').innerText=0;
+  nextRound();
+};
+</script>
+</body>
+</html>
