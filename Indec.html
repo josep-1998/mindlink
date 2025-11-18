@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindLink — Multi Estilo</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        transition: all 0.4s ease;
+        text-align: center;
+    }
+
+    h1 {
+        margin-top: 40px;
+    }
+
+    #game {
+        margin-top: 40px;
+        font-size: 45px;
+        font-weight: bold;
+        letter-spacing: 10px;
+    }
+
+    /* ----- SELECTOR DE ESTILOS ----- */
+    .style-selector {
+        margin-top: 20px;
+    }
+
+    select {
+        padding: 10px 20px;
+        font-size: 18px;
+        border-radius: 10px;
+    }
+
+    /* ----- ESTILOS ----- */
+
+    /* 1. CYBER FUTURISTA */
+    .cyber {
+        background: black;
+        color: cyan;
+        text-shadow: 0 0 10px cyan;
+    }
+
+    .cyber #game {
+        text-shadow: 0 0 15px cyan, 0 0 25px blue;
+    }
+
+    /* 2. MINIMALISTA */
+    .minimal {
+        background: white;
+        color: black;
+    }
+
+    .minimal #game {
+        letter-spacing: 5px;
+    }
+
+    /* 3. GAMER */
+    .gamer {
+        background: linear-gradient(180deg, #ff00ff, #00ccff);
+        color: white;
+        text-shadow: 0 0 5px black;
+    }
+
+    .gamer #game {
+        transform: rotate(-2deg);
+    }
+
+    /* 4. MATRIX */
+    .matrix {
+        background: black;
+        color: #00ff00;
+        font-family: monospace;
+        text-shadow: 0 0 8px #00ff00;
+    }
+
+</style>
+
+</head>
+<body class="cyber">
+
+<h1>🧠 MINDLINK — Multi Estilo</h1>
+
+<div class="style-selector">
+    <select id="styleChanger">
+        <option value="cyber">Futurista (Cyber)</option>
+        <option value="minimal">Minimalista</option>
+        <option value="gamer">Gamer</option>
+        <option value="matrix">Matrix</option>
+    </select>
+</div>
+
+<div id="game">MEMORIA</div>
+
+<script>
+    const body = document.body;
+    const styleChanger = document.getElementById("styleChanger");
+
+    styleChanger.addEventListener("change", function() {
+        body.className = styleChanger.value;
+    });
+</script>
+
+</body>
+</html>
