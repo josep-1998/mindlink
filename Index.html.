@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MindLink — All-in-One Styles</title>
+<style>
+:root{
+  --bg:#07070a; --panel:#0f1114; --text:#e6eef8;
+  --accent:#00d1ff; --accent2:#8a4cff; --muted:#9aa3b2;
+}
+*{box-sizing:border-box;font-family:Inter,Roboto,Arial;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.container{width:100%;max-width:920px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:14px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.brand{font-weight:800;font-size:20px;color:var(--accent);}
+.controls{display:flex;gap:8px;}
+.switch{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;}
+.switch.active{box-shadow:0 6px 24px rgba(0,0,0,0.5);outline:2px solid rgba(255,255,255,0.02);transform:translateY(-2px);}
+
+/* layout */
+.main{display:flex;gap:18px;flex-wrap:wrap;}
+.left{flex:1;min-width:300px}
+.right{width:340px}
+
+/* board */
+.board{width:100%;max-width:420px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.pad{height:140px;border-radius:14px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.02);}
+.pad .dot{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.06);}
+.pad.glow{transform:scale(1.03);box-shadow:0 10px 40px rgba(0,0,0,0.6)}
+
+/* default theme (will be overridden by theme classes) */
+.theme-cyber { --accent:#00d1ff; --accent2:#8a4cff; --bg:#071022; --panel:linear-gradient(180deg,#071022,#000); --text:#dff9ff; }
+.theme-minimal{ --accent:#ffffff; --accent2:#d1d1d1; --bg:#0b0b0b; --panel:linear-gradient(180deg,#0f1113,#0b0b0b); --text:#eef2f6; }
+.theme-gamer{ --accent:#ffd166; --accent2:#ff7b00; --bg:linear-gradient(180deg,#0b1221,#07102a); --text:#fff; }
+.theme-matrix{ --accent:#90ff90; --accent2:#3fe03f; --bg:#000; --text:#90ff90; }
+
+.header .brand{color:var(--accent); text-shadow:0 6px 18px rgba(0,0,0,0.4);}
+.score{font-weight:800;color:var(--text);}
+.btn{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#06101a;padding:10px 14px;border-radius:10px;border:none;font-weight:700;cursor:pointer;}
+
+/* right panel */
+.panel-card{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);margin-bottom:12px;color:var(--muted);}
+.panel-card h3{color:var(--text);margin-bottom:6px;font-size:14px;}
+.footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;color:var(--muted);font-size:12px;}
+
+/* small responsive */
+@media(max-width:900px){ .main{flex-direction:column} .right{width:100%} .board{order:2} }
+</style>
+</head>
+<body>
+<div class="container theme-cyber" id="app">
+  <div class="header">
+    <div class="brand">MindLink — All Styles</div>
+    <div class="controls" role="tablist" aria-label="Theme switcher">
+      <button class="switch active" data-theme="cyber">Cyber</button>
+      <button class="switch" data-theme="minimal">Minimal</button>
+      <button class="switch" data-theme="gamer">Gamer</button>
+      <button class="switch" data-theme="matrix">Matrix</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="left">
+      <div class="board" id="board">
+        <div class="pad" data-id="0"><div class="dot"></div></div>
+        <div class="pad" data-id="1"><div class="dot"></div></div>
+        <div class="pad" data-id="2"><div class="dot"></div></div>
+        <div class="pad" data-id="3"><div class="dot"></div></div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:12px;align-items:center">
+        <button class="btn" id="startBtn">▶ Jugar</button>
+        <div class="score">Puntuación: <span id="score">0</span></div>
+      </div>
+
+      <div style="margin-top:12px;color:var(--muted)">
+        <p><strong>Cómo jugar:</strong> Repite la secuencia de luces antes de que tu eco lo haga. Cada ronda añade un paso.</p>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="panel-card">
+        <h3>Tu Eco</h3>
+        <p id="ecoInfo">Sin eco — juega para crear tu eco.</p>
+      </div>
+      <div class="panel-card">
+        <h3>Opciones</h3>
+        <p><button class="switch" id="replayEchoBtn" style="padding:8px 10px">🔁 Ver Eco</button> <button class="switch" id="resetBtn" style="padding:8px 10px">Reset</button></p>
+      </div>
+      <div class="panel-card">
+        <h3>Exportar</h3>
+        <p>Descarga la variante actual como archivo HTML para subir a GitHub.</p>
+        <p><button class="btn" id="downloadBtn">Descargar HTML</button></p>
+      </div>
+      <div class="footer"><div>MindLink • Demo</div><div id="themeLabel">Cyber</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Game logic (shared across themes)
+const app = document.getElementById('app');
+const board = document.getElementById('board');
+const pads = Array.from(board.querySelectorAll('.pad'));
+const startBtn = document.getElementById('startBtn');
+const replayEchoBtn = document.getElementById('replayEchoBtn');
+const resetBtn = document.getElementById('resetBtn');
+const scoreEl = document.getElementById('score');
+const ecoInfo = document.getElementById('ecoInfo');
+const downloadBtn = document.getElementById('downloadBtn');
+const themeLabel = document.getElementById('themeLabel');
+
+let sequence = [];
+let playerSeq = [];
+let playing = false;
+let acceptingInput = false;
+let score = 0;
+
+// sounds
+function beep(freq, time=120){
+  try{
+    const ctx = window.__ml_audio_ctx || new (window.AudioContext || window.webkitAudioContext)();
+    window.__ml_audio_ctx = ctx;
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type='sine'; o.frequency.value = freq; o.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime+0.01);
+    o.start(); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + time/1000);
+    setTimeout(()=> o.stop(), time+50);
+  }catch(e){}
+}
+
+function highlightPad(id, ms=350){
+  pads[id].classList.add('glow');
+  if(id===0) beep(440); if(id===1) beep(520); if(id===2) beep(620); if(id===3) beep(720);
+  setTimeout(()=> pads[id].classList.remove('glow'), ms);
+}
+
+function loadEco(){
+  const eco = JSON.parse(localStorage.getItem('mindlink_eco') || 'null');
+  if(eco && eco.seq && eco.seq.length>0){
+    ecoInfo.textContent = `Eco guardado: ${eco.seq.length} pasos — última puntuación: ${eco.score||0}`;
+  } else {
+    ecoInfo.textContent = 'Sin eco — juega para crear tu eco.';
+  }
+  return eco;
+}
+
+function saveEco(seq, scoreVal){
+  const eco = { seq, score: scoreVal, created: Date.now() };
+  localStorage.setItem('mindlink_eco', JSON.stringify(eco));
+  loadEco();
+}
+
+function randPad(){ return Math.floor(Math.random()*4); }
+
+async function playSequence(seq, speed=500, showGhost=false){
+  acceptingInput = false;
+  for(let i=0;i<seq.length;i++){
+    highlightPad(seq[i], Math.max(220, speed-60));
+    await new Promise(r=>setTimeout(r, speed));
+  }
+  acceptingInput = true;
+}
+
+async function nextRound(){
+  sequence.push(randPad());
+  playerSeq = [];
+  await playSequence(sequence, Math.max(280, 700 - sequence.length*10), true);
+}
+
+function endGame(){
+  playing = false;
+  acceptingInput = false;
+  saveEco(sequence.slice(0), score);
+  alert(`Juego terminado. Puntuación: ${score}`);
+}
+
+function onPadPress(id){
+  if(!playing || !acceptingInput) return;
+  playerSeq.push(id);
+  highlightPad(id, 220);
+  const idx = playerSeq.length - 1;
+  if(playerSeq[idx] !== sequence[idx]){
+    endGame();
+    return;
+  }
+  if(playerSeq.length === sequence.length){
+    score = sequence.length;
+    scoreEl.textContent = score;
+    setTimeout(()=> nextRound(), 700);
+  }
+}
+
+pads.forEach((p,i)=> p.addEventListener('click', ()=> onPadPress(i)));
+
+startBtn.addEventListener('click', ()=>{
+  if(playing) return;
+  sequence = []; playerSeq = []; score = 0; scoreEl.textContent = 0; playing = true;
+  nextRound();
+});
+
+replayEchoBtn.addEventListener('click', async ()=>{
+  const eco = loadEco();
+  if(!eco || !eco.seq || eco.seq.length===0){ alert('No hay eco guardado todavía.'); return; }
+  await playSequence(eco.seq, 420, true);
+});
+
+resetBtn.addEventListener('click', ()=>{
+  if(confirm('Resetear eco?')){ localStorage.removeItem('mindlink_eco'); loadEco(); }
+});
+
+loadEco();
+
+// Theme switching & export
+const switches = document.querySelectorAll('.switch[data-theme]');
+switches.forEach(btn=> btn.addEventListener('click', ()=>{
+  switches.forEach(b=> b.classList.remove('active'));
+  btn.classList.add('active');
+  const t = btn.getAttribute('data-theme');
+  app.className = 'container theme-' + t;
+  themeLabel.textContent = btn.textContent;
+}));
+
+// download current HTML (client-side)
+downloadBtn.addEventListener('click', ()=>{
+  const theme = document.querySelector('.switch.active').getAttribute('data-theme');
+  const filename = 'mindlink_'+theme+'.html';
+  const docTitle = 'MindLink - '+theme;
+  // Using the current style block and container markup to generate a standalone file
+  const styleText = Array.from(document.querySelectorAll('style')).map(s=>s.innerText).join('\n');
+  const standalone = '<!doctype html><html lang="es"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>'+docTitle+'</title><style>'+styleText+'</style></head><body>'+ document.querySelector('.container').outerHTML + '<script>'+ 
+    // minimal game logic (recreate functions)
+    "const pads=Array.from(document.querySelectorAll('.pad'));let sequence=[],playerSeq=[],playing=false,acceptingInput=false,score=0;function beep(f,t=120){try{const ctx=window.__ml_audio_ctx||new(window.AudioContext||window.webkitAudioContext)();window.__ml_audio_ctx=ctx;const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(0.0001,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.2,ctx.currentTime+0.01);o.start();g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+t/1000);setTimeout(()=>o.stop(),t+50);}catch(e){} }" +
+    "function highlightPad(id,ms=350){pads[id].classList.add('glow');if(id===0)beep(440);if(id===1)beep(520);if(id===2)beep(620);if(id===3)beep(720);setTimeout(()=>pads[id].classList.remove('glow'),ms);}"+
+    "function randPad(){return Math.floor(Math.random()*4);}"+
+    "async function playSequence(seq,speed=500){acceptingInput=false;for(let i=0;i<seq.length;i++){highlightPad(seq[i],Math.max(220,speed-60));await new Promise(r=>setTimeout(r,speed));}acceptingInput=true;}"+
+    "async function nextRound(){sequence.push(randPad());playerSeq=[];await playSequence(sequence,Math.max(280,700-sequence.length*10));}"+
+    "function onPadPress(id){if(!playing||!acceptingInput)return;playerSeq.push(id);highlightPad(id,220);const idx=playerSeq.length-1;if(playerSeq[idx]!==sequence[idx]){playing=false;acceptingInput=false;alert('Perdiste! Puntuación: '+score);sequence=[];score=0;document.getElementById('score').innerText=0;setTimeout(()=>{sequence=[];playerSeq=[];score=0;document.getElementById('score').innerText=0;},500);return;}if(playerSeq.length===sequence.length){score=sequence.length;document.getElementById('score').innerText=score;setTimeout(()=>nextRound(),700);}}"+
+    "pads.forEach((p,i)=>p.addEventListener('click',()=>onPadPress(i)));"+
+    "document.querySelector('[id=startBtn]').addEventListener('click',()=>{if(playing) return;sequence=[];playerSeq=[];score=0;document.getElementById('score').innerText=0;playing=true;nextRound();});"+
+    "document.querySelectorAll('.switch').forEach(b=>b.addEventListener('click',()=>{}));" +
+  "</script></body></html>";
+  const blob = new Blob([standalone], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+  setTimeout(()=> URL.revokeObjectURL(url), 1500);
+});
+</script>
+</body>
+</html>
