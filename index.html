@@ -431,3 +431,85 @@ loadProgress();
 </script>
 </body>
 </html>
+<script>
+let secuencia = [];
+let jugador = [];
+let ronda = 0;
+let bloqueando = false;
+
+// sonidos opcionales
+const sonidos = [
+    new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"),
+    new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"),
+    new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg"),
+    new Audio("https://actions.google.com/sounds/v1/cartoon/metal_twang.ogg")
+];
+
+function pad(i) {
+    return document.querySelector(`[data-id="${i}"]`);
+}
+
+function iluminar(i) {
+    return new Promise((resolve) => {
+        const p = pad(i);
+        p.classList.add("glow");
+        sonidos[i].play();
+
+        setTimeout(() => {
+            p.classList.remove("glow");
+            setTimeout(resolve, 150);
+        }, 500);
+    });
+}
+
+async function reproducirSecuencia() {
+    bloqueando = true;
+    for (let i of secuencia) {
+        await iluminar(i);
+    }
+    bloqueando = false;
+}
+
+function nuevaRonda() {
+    jugador = [];
+    ronda++;
+    document.getElementById("ronda").textContent = ronda;
+
+    secuencia.push(Math.floor(Math.random() * 4));
+    reproducirSecuencia();
+}
+
+function clickPad(e) {
+    if (bloqueando) return;
+
+    const id = Number(e.target.dataset.id);
+    jugador.push(id);
+    iluminar(id);
+
+    // comprobar
+    if (jugador[jugador.length - 1] !== secuencia[jugador.length - 1]) {
+        alert("❌ Fallaste. Pulsa Jugar para empezar otra vez.");
+        reiniciar();
+        return;
+    }
+
+    if (jugador.length === secuencia.length) {
+        setTimeout(nuevaRonda, 800);
+    }
+}
+
+function reiniciar() {
+    secuencia = [];
+    jugador = [];
+    ronda = 0;
+    document.getElementById("ronda").textContent = "-";
+}
+
+function startGame() {
+    reiniciar();
+    nuevaRonda();
+}
+
+document.getElementById("startGame").addEventListener("click", startGame);
+document.querySelectorAll(".pad").forEach(p => p.addEventListener("click", clickPad));
+</script>
